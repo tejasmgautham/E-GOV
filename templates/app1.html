@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-GOV</title>  
+</head>
+<body>
+    <h2>E-GOV</h2>
+    <p>Welcome! This is E-GOV Portal</p>
+
+    <button onclick="redirectToApp2()">Go to App 2</button>
+
+    <h3>Logs:</h3>
+    <pre id="log"></pre>
+
+    <script>
+        function logMessage(msg) {
+            console.log(msg);
+            document.getElementById("log").textContent += msg + "\n";
+        }
+
+        async function verifyWithKeycloak(token) {
+            logMessage("🔄 Verifying JWT with Keycloak...");
+            try {
+                const response = await fetch("/verify-token", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ token })
+                });
+
+                const result = await response.json();
+                if (result.valid) {
+                    logMessage("✅ JWT Verified Successfully!");
+                    return true;
+                } else {
+                    logMessage("❌ JWT Verification Failed!");
+                    return false;
+                }
+            } catch (error) {
+                logMessage("⚠️ Error Verifying JWT: " + error.message);
+                return false;
+            }
+        }
+
+        async function redirectToApp2() {
+            const jwtToken = localStorage.getItem("keycloakToken");
+            console.log("Stored JWT Token:", jwtToken);
+
+            if (!jwtToken) {
+                alert("⚠️ No JWT Token found! Please log in first.");
+                logMessage("⚠️ No JWT Token found!");
+                return;
+            }
+
+            logMessage("🔑 JWT Token: " + jwtToken);
+
+            const isValid = await verifyWithKeycloak(jwtToken);
+            if (!isValid) {
+                alert("❌ JWT verification failed! Please log in again.");
+                logMessage("❌ Redirecting to login...");
+                window.location.href = "/";
+                return;
+            }
+
+            // Redirect to app2 with token only
+            window.location.href = `http://localhost:5016/app2.html?token=${jwtToken}`;
+        }
+
+        async function checkAuthOnLoad() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get("token");
+
+            if (token) {
+                logMessage("🔍 Found JWT Token in URL. Verifying...");
+                const isValid = await verifyWithKeycloak(token);
+                if (isValid) {
+                    localStorage.setItem("keycloakToken", token);
+                    logMessage("✅ Token verified and stored!");
+                } else {
+                    logMessage("❌ Invalid token! Redirecting to login...");
+                    window.location.href = "/";
+                }
+            } else {
+                logMessage("🔍 No JWT Token found in URL.");
+            }
+        }
+
+        checkAuthOnLoad();
+    </script>
+</body>
+</html>

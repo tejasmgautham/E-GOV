@@ -1,0 +1,37 @@
+[{
+    "id":"",
+    "type":"",
+    "profile":{"attribute":"","value":""},
+    "affiliation":{"entity":"","dept":"","role":""},
+    "contact":{
+        "email":"",
+        "phone":"",
+        "url":"",
+        "address":{
+            "Building": "building",
+            "Street" : "street",
+            "Area": "area",
+            "City": "city",
+            "State": "state",
+            "Country": "country",
+            "URL Address": "url_address",
+            "Latitude": "latitude",
+            "Longitude": "longitude"
+        }
+    },
+    "entities_master":{},
+    "role_master":{}
+}]
+
+[{
+    "id":"",
+    "type":"",
+    "profile":{"attribute":"","value":""},
+    "affiliation":{"entity":"","dept":"","role":""},
+    "contact":{
+        "email":"",
+        "phone":"",
+        "url":"",
+        "address":{}   
+    }
+}]
